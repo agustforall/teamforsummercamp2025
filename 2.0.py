@@ -208,7 +208,9 @@ class StockApp:
             return
         self.signal_label.config(text="📊 Signal: " + signal_analysis(df))
         plot_chart(df, ts_code, self.chart_frame, self.freq_var.get())
-
+        from datetime import datetime
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.date_label.config(text=f"📅 Query Time: {now}")
     def add_to_favorites(self):
         code = self.entry.get().strip()
         ts_code = format_ts_code(code)
