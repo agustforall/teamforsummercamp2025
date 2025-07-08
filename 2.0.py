@@ -170,7 +170,10 @@ class StockApp:
 
         self.signal_label = tk.Label(root, text="📊 Signal:", fg='blue', bg='#f5f7fa', anchor='w')
         self.signal_label.pack(fill=tk.X, padx=10)
-
+        
+        self.date_label = tk.Label(root, text="📅 Latest Data Date:", fg='gray', bg='#f5f7fa', anchor='w')  # ←新增
+        self.date_label.pack(fill=tk.X, padx=10)
+    
         self.chart_frame = tk.Frame(root, bg='white', relief=tk.RIDGE, borderwidth=1)
         self.chart_frame.pack(fill=tk.BOTH, expand=1, padx=10, pady=5)
 
