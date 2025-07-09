@@ -10,8 +10,9 @@ import os
 import tkinter.font as tkFont
 
 # 设置Tushare token
-TUSHARE_TOKEN = 'f8635a89f62c17130e715107bb0b4020528ebd0a9719d185d3bc0692'
+from config import TUSHARE_TOKEN
 ts.set_token(TUSHARE_TOKEN)
+
 pro = ts.pro_api()
 FAVORITES_FILE = 'favorites.json'
 
