@@ -211,3 +211,31 @@ def train_ai_model(df):
     accuracy = accuracy_score(y_test, y_pred)
     
     return model, f"模型准确率: {accuracy:.2f}"
+
+# 生成AI投资建议
+def generate_ai_recommendation(model, latest_data):
+    """基于最新数据生成投资建议"""
+    if model is None:
+        return "无法生成建议: 模型未训练"
+    
+    features = ['macd', 'macdsignal', 'macdhist', 'rsi', 'k', 'd', 'j', 'ma5', 'ma10', 'ma20', 'upperband', 'middleband', 'lowerband']
+    
+    # 检查是否有足够的数据
+    if latest_data is None or len(latest_data) < 1:
+        return "无法生成建议: 缺少数据"
+    
+    # 获取最新的特征数据
+    try:
+        latest_features = latest_data[features].iloc[-1:]
+    except KeyError as e:
+        return f"无法生成建议: 缺少特征 {e}"
+    
+    # 预测
+    prediction = model.predict(latest_features)
+    probability = model.predict_proba(latest_features)[0][prediction[0]]
+    
+    # 生成建议
+    if prediction[0] == 1:
+        return f"📈 AI建议: 买入 (概率: {probability:.2f})\n基于技术指标分析，预计股价将上涨"
+    else:
+        return f"📉 AI建议: 卖出 (概率: {probability:.2f})\n基于技术指标分析，预计股价将下跌"
