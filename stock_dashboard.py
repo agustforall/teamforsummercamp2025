@@ -290,3 +290,27 @@ def plot_chart(df, stock_name):
         ax.plot(df.index, df['ma60'], label='60日均线', color='brown', linewidth=1.5)
         ax.legend()
     
+    # 绘制布林带
+    if show_boll:
+        ax.plot(df.index, df['upperband'], label='上轨', color='gray', linestyle='--', linewidth=1)
+        ax.plot(df.index, df['middleband'], label='中轨', color='gray', linewidth=1)
+        ax.plot(df.index, df['lowerband'], label='下轨', color='gray', linestyle='--', linewidth=1)
+        ax.fill_between(df.index, df['upperband'], df['lowerband'], color='gray', alpha=0.1)
+    
+    ax.set_title(f'{stock_name} K线图', fontsize=14)
+    ax.grid(True, linestyle='--', alpha=0.7)
+    ax.tick_params(axis='x', rotation=45)
+    
+    # MACD
+    if show_macd and ax_idx < len(axes):
+        ax = axes[ax_idx]
+        ax_idx += 1
+        ax.plot(df.index, df['macd'], label='MACD', color='blue', linewidth=1.5)
+        ax.plot(df.index, df['macdsignal'], label='Signal', color='red', linewidth=1.5)
+        ax.bar(df.index, df['macdhist'], label='Histogram', color='gray', alpha=0.5)
+        ax.axhline(0, color='black', linewidth=0.8, linestyle='--')
+        ax.set_title('MACD指标', fontsize=14)
+        ax.legend()
+        ax.grid(True, linestyle='--', alpha=0.7)
+        ax.tick_params(axis='x', rotation=45)
+
