@@ -268,3 +268,25 @@ def plot_chart(df, stock_name):
     up = df[df.close >= df.open]
     down = df[df.close < df.open]
 
+    # 设置K线颜色
+    col1 = 'red'
+    col2 = 'green'
+    
+    # 绘制上涨K线
+    ax.bar(up.index, up.close - up.open, 0.8, bottom=up.open, color=col1)
+    ax.bar(up.index, up.high - up.close, 0.2, bottom=up.close, color=col1)
+    ax.bar(up.index, up.low - up.open, 0.2, bottom=up.open, color=col1)
+    
+    # 绘制下跌K线
+    ax.bar(down.index, down.close - down.open, 0.8, bottom=down.open, color=col2)
+    ax.bar(down.index, down.high - down.open, 0.2, bottom=down.open, color=col2)
+    ax.bar(down.index, down.low - down.close, 0.2, bottom=down.close, color=col2)
+    
+    # 绘制均线
+    if show_ma:
+        ax.plot(df.index, df['ma5'], label='5日均线', color='orange', linewidth=1.5)
+        ax.plot(df.index, df['ma10'], label='10日均线', color='purple', linewidth=1.5)
+        ax.plot(df.index, df['ma20'], label='20日均线', color='blue', linewidth=1.5)
+        ax.plot(df.index, df['ma60'], label='60日均线', color='brown', linewidth=1.5)
+        ax.legend()
+    
