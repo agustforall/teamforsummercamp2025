@@ -180,3 +180,29 @@ def calculate_technical_indicators(df):
         df['close'].values, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
     
     return df
+
+# 训练简单的AI模型
+def train_ai_model(df):
+    """基于技术指标训练简单的分类模型"""
+    # 创建目标变量：明天收盘价是否高于今天
+    df['target'] = np.where(df['close'].shift(-1) > df['close'], 1, 0)
+    
+    # 选择特征
+    features = ['macd', 'macdsignal', 'macdhist', 'rsi', 'k', 'd', 'j', 'ma5', 'ma10', 'ma20', 'upperband', 'middleband', 'lowerband']
+    
+    # 删除含有NaN值的行
+    df = df.dropna(subset=features + ['target'])
+    
+    if len(df) < 30:
+        return None, "样本量不足，无法训练模型"
+    
+    X = df[features]
+    y = df['target']
+    
+    # 划分训练集和测试集
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # 训练逻辑回归模型
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X_train, y_train)
+    
