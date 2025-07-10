@@ -239,3 +239,10 @@ def generate_ai_recommendation(model, latest_data):
         return f"📈 AI建议: 买入 (概率: {probability:.2f})\n基于技术指标分析，预计股价将上涨"
     else:
         return f"📉 AI建议: 卖出 (概率: {probability:.2f})\n基于技术指标分析，预计股价将下跌"
+# 绘制K线图和技术指标
+def plot_chart(df, stock_name):
+    """绘制K线图和技术指标"""
+    if df is None or df.empty:
+        st.warning("没有找到数据，请检查股票代码和时间范围")
+        return
+    
