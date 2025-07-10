@@ -333,3 +333,21 @@ def plot_chart(df, stock_name):
         ax.grid(True, linestyle='--', alpha=0.7)
         ax.tick_params(axis='x', rotation=45)
     
+    # 成交量
+    if show_volume and ax_idx < len(axes):
+        ax = axes[ax_idx]
+        ax_idx += 1
+        # 绘制成交量柱状图
+        up_volume = df[df.close >= df.open]['vol']
+        down_volume = df[df.close < df.open]['vol']
+        
+        ax.bar(up_volume.index, up_volume, color=col1, label='上涨成交量')
+        ax.bar(down_volume.index, down_volume, color=col2, label='下跌成交量')
+        ax.set_title('成交量', fontsize=14)
+        ax.legend()
+        ax.grid(True, linestyle='--', alpha=0.7)
+        ax.tick_params(axis='x', rotation=45)
+    
+    plt.tight_layout()
+    st.pyplot(fig)
+
