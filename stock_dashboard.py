@@ -132,3 +132,51 @@ def search_stock(keyword):
             all_stocks = pro.stock_basic(exchange='', list_status='L', fields='ts_code,name,area,industry,list_date')
             df = all_stocks[all_stocks['name'].str.contains(keyword, case=False)]
     return df
+    
+# 获取股票数据
+@st.cache_data
+def get_stock_data(ts_code, start_date, end_date):
+    """获取股票日线数据"""
+    start_str = start_date.strftime("%Y%m%d")
+    end_str = end_date.strftime("%Y%m%d")
+    df = pro.daily(ts_code=ts_code, start_date=start_str, end_date=end_str)
+    if df.empty:
+        return None
+    # 转换日期格式
+    df['trade_date'] = pd.to_datetime(df['trade_date'], format='%Y%m%d')
+    # 按日期排序
+    df = df.sort_values('trade_date')
+    # 设置日期为索引
+    df.set_index('trade_date', inplace=True)
+    # 计算技术指标
+    calculate_technical_indicators(df)
+    return df
+
+# 计算技术指标
+def calculate_technical_indicators(df):
+    """计算各种技术指标"""
+    # MACD
+    df['macd'], df['macdsignal'], df['macdhist'] = talib.MACD(
+        df['close'].values, fastperiod=12, slowperiod=26, signalperiod=9)
+    
+    # RSI
+    df['rsi'] = talib.RSI(df['close'].values, timeperiod=14)
+    
+    # KDJ
+    df['k'], df['d'] = talib.STOCH(
+        df['high'].values, df['low'].values, df['close'].values,
+        fastk_period=9, slowk_period=3, slowk_matype=0,
+        slowd_period=3, slowd_matype=0)
+    df['j'] = 3 * df['k'] - 2 * df['d']
+    
+    # 均线
+    df['ma5'] = talib.SMA(df['close'].values, timeperiod=5)
+    df['ma10'] = talib.SMA(df['close'].values, timeperiod=10)
+    df['ma20'] = talib.SMA(df['close'].values, timeperiod=20)
+    df['ma60'] = talib.SMA(df['close'].values, timeperiod=60)
+    
+    # 布林带
+    df['upperband'], df['middleband'], df['lowerband'] = talib.BBANDS(
+        df['close'].values, timeperiod=20, nbdevup=2, nbdevdn=2, matype=0)
+    
+    return df
