@@ -50,3 +50,25 @@ pro = ts.pro_api()
 
 # 标题
 st.title("📈 股票行情分析平台")
+
+# 侧边栏 - 股票搜索
+st.sidebar.header("股票选择")
+stock_code = st.sidebar.text_input(
+    "输入股票代码或名称", 
+    value=st.session_state.selected_stock_code, 
+    help="例如: 600036 或 招商银行"
+)
+
+# 侧边栏 - 时间范围选择
+st.sidebar.header("时间范围")
+end_date = datetime.datetime.now()
+start_date = st.sidebar.date_input(
+    "开始日期",
+    value=end_date - datetime.timedelta(days=365),
+    max_value=end_date - datetime.timedelta(days=1)
+)
+end_date = st.sidebar.date_input(
+    "结束日期",
+    value=end_date,
+    max_value=end_date
+)
