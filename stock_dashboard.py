@@ -72,3 +72,32 @@ end_date = st.sidebar.date_input(
     value=end_date,
     max_value=end_date
 )
+
+# 侧边栏 - 技术指标选择
+st.sidebar.header("技术指标")
+show_macd = st.sidebar.checkbox("MACD", value=True)
+show_rsi = st.sidebar.checkbox("RSI", value=True)
+show_kdj = st.sidebar.checkbox("KDJ", value=True)
+show_ma = st.sidebar.checkbox("均线", value=True)
+show_boll = st.sidebar.checkbox("布林带", value=True)
+show_volume = st.sidebar.checkbox("成交量", value=True)
+
+# 侧边栏 - 自选股
+st.sidebar.header("自选股")
+if st.session_state.watchlist:
+    for i, stock in enumerate(st.session_state.watchlist):
+        col1, col2 = st.sidebar.columns([4, 1])
+        with col1:
+            if st.button(f"{stock['name']} ({stock['ts_code']})", key=f'watch_{i}'):
+                st.session_state.selected_stock_code = stock['ts_code'].split('.')[0]
+                st.experimental_rerun()
+        with col2:
+            if st.button('🗑️', key=f'del_{i}', help='删除自选股'):
+                st.session_state.watchlist.pop(i)
+                st.rerun()
+else:
+    st.sidebar.info('暂无自选股，搜索股票后可添加')
+
+# 侧边栏 - AI分析设置
+st.sidebar.header("AI分析")
+use_ai = st.sidebar.checkbox("启用AI投资建议", value=True)
