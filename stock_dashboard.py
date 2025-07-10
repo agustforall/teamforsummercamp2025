@@ -350,4 +350,76 @@ def plot_chart(df, stock_name):
     
     plt.tight_layout()
     st.pyplot(fig)
+# 主逻辑
+def main():
+     # 搜索股票
+     stock_df = search_stock(stock_code)
+      
+     if stock_df.empty:
+         st.warning("未找到匹配的股票，请尝试：\n1. 沪市代码示例：'600036'（招商银行）或'601318.SH'（中国平安）\n2. 深市代码示例：'000001'（平安银行）或'300059.SZ'（东方财富）\n3. 名称搜索示例：'茅台'、'宁德时代'（支持模糊匹配）\n4. 确保API密钥有效且有访问权限")
+         return
+      
+     # 显示搜索结果
+     st.subheader("股票信息")
+     st.dataframe(stock_df, use_container_width=True)
+      
+     # 添加到自选股按钮
+     if not stock_df.empty:
+         selected_stock = stock_df.iloc[0]
+         if not any(s['ts_code'] == selected_stock['ts_code'] for s in st.session_state.watchlist):
+             if st.button('📌 添加到自选股', key='add_watch'):
+                 st.session_state.watchlist.append(selected_stock.to_dict())
+                 st.success(f'已将 {selected_stock["name"]} 添加到自选股')
+         else:
+             st.info(f'{selected_stock["name"]} 已在自选股中')
+      
+     # 选择第一个匹配的股票
+     selected_stock = stock_df.iloc[0]
+     ts_code = selected_stock['ts_code']
+     stock_name = selected_stock['name']
+      
+     # 获取股票数据
+     with st.spinner(f"正在获取{stock_name}({ts_code})的行情数据..."):
+         df = get_stock_data(ts_code, start_date, end_date)
+      
+     # 显示数据摘要
+     if df is not None and not df.empty:
+         st.subheader(f"{stock_name}({ts_code}) 行情摘要")
+         col1, col2, col3, col4, col5 = st.columns(5)
+         with col1:
+             st.metric("最新价格", f"{df['close'].iloc[-1]:.2f}")
+         with col2:
+             change = df['close'].iloc[-1] - df['close'].iloc[-2]
+             pct_change = (change / df['close'].iloc[-2]) * 100
+             st.metric("涨跌幅", f"{change:.2f} ({pct_change:.2f}%)", delta=f"{pct_change:.2f}%")
+         with col3:
+             st.metric("最高价", f"{df['high'].iloc[-1]:.2f}")
+         with col4:
+             st.metric("最低价", f"{df['low'].iloc[-1]:.2f}")
+         with col5:
+             st.metric("成交量", f"{df['vol'].iloc[-1]/10000:.2f}万手")
 
+
+         # 绘制图表
+         st.subheader("技术分析图表")
+         plot_chart(df, stock_name)
+          
+         # 显示原始数据
+         with st.expander("查看原始数据"):
+             st.dataframe(df, use_container_width=True, hide_index=True)
+
+         # AI分析
+         if use_ai:
+             st.subheader("AI投资建议")
+             with st.spinner("正在训练AI模型..."):
+                 model, accuracy_msg = train_ai_model(df.copy())
+              
+             if model is not None:
+                 st.success(accuracy_msg)
+                 recommendation = generate_ai_recommendation(model, df)
+                 st.info(recommendation)
+             else:
+                 st.warning(accuracy_msg)
+    
+if __name__ == "__main__":
+    main()
