@@ -101,3 +101,34 @@ else:
 # 侧边栏 - AI分析设置
 st.sidebar.header("AI分析")
 use_ai = st.sidebar.checkbox("启用AI投资建议", value=True)
+
+# 股票搜索功能
+@st.cache_data
+def search_stock(keyword):
+    """根据关键字搜索股票"""
+    if keyword.isdigit():
+        # 按代码搜索，直接获取所有股票并筛选
+        try:
+            all_stocks = pro.stock_basic(exchange='', list_status='L', fields='ts_code,name,area,industry,list_date')
+            if all_stocks.empty:
+                st.error("无法获取股票列表，请检查API密钥权限或网络连接")
+                return pd.DataFrame()
+            # 提取纯数字代码进行匹配
+            all_stocks['pure_code'] = all_stocks['ts_code'].str.split('.').str[0]
+            # 精确匹配代码
+            df = all_stocks[all_stocks['pure_code'] == keyword]
+            # 如果精确匹配不到，尝试模糊匹配
+            if df.empty:
+                df = all_stocks[all_stocks['pure_code'].str.contains(keyword)]
+            return df
+        except Exception as e:
+            st.error(f"获取股票数据失败: {str(e)}")
+            return pd.DataFrame()
+    else:
+        # 按名称搜索，先精确匹配
+        df = pro.stock_basic(exchange='', list_status='L', name=keyword, fields='ts_code,name,area,industry,list_date')
+        # 如果精确匹配为空，尝试模糊匹配
+        if df.empty:
+            all_stocks = pro.stock_basic(exchange='', list_status='L', fields='ts_code,name,area,industry,list_date')
+            df = all_stocks[all_stocks['name'].str.contains(keyword, case=False)]
+    return df
