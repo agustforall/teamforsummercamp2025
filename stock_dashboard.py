@@ -314,3 +314,22 @@ def plot_chart(df, stock_name):
         ax.grid(True, linestyle='--', alpha=0.7)
         ax.tick_params(axis='x', rotation=45)
 
+    # RSI和KDJ
+    if (show_rsi or show_kdj) and ax_idx < len(axes):
+        ax = axes[ax_idx]
+        ax_idx += 1
+        if show_rsi:
+            ax.plot(df.index, df['rsi'], label='RSI', color='purple', linewidth=1.5)
+            ax.axhline(70, color='red', linestyle='--', linewidth=0.8)
+            ax.axhline(30, color='green', linestyle='--', linewidth=0.8)
+        if show_kdj:
+            ax.plot(df.index, df['k'], label='K', color='blue', linewidth=1.5)
+            ax.plot(df.index, df['d'], label='D', color='orange', linewidth=1.5)
+            ax.plot(df.index, df['j'], label='J', color='purple', linewidth=1.5)
+            ax.axhline(80, color='red', linestyle='--', linewidth=0.8)
+            ax.axhline(20, color='green', linestyle='--', linewidth=0.8)
+        ax.set_title('RSI/KDJ指标', fontsize=14)
+        ax.legend()
+        ax.grid(True, linestyle='--', alpha=0.7)
+        ax.tick_params(axis='x', rotation=45)
+    
