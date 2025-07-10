@@ -239,6 +239,7 @@ def generate_ai_recommendation(model, latest_data):
         return f"📈 AI建议: 买入 (概率: {probability:.2f})\n基于技术指标分析，预计股价将上涨"
     else:
         return f"📉 AI建议: 卖出 (概率: {probability:.2f})\n基于技术指标分析，预计股价将下跌"
+
 # 绘制K线图和技术指标
 def plot_chart(df, stock_name):
     """绘制K线图和技术指标"""
@@ -246,3 +247,24 @@ def plot_chart(df, stock_name):
         st.warning("没有找到数据，请检查股票代码和时间范围")
         return
     
+ # 创建图形
+    fig, axes = plt.subplots(
+        nrows=4 if show_volume else 3,
+        ncols=1,
+        figsize=(16, 12),
+        gridspec_kw={
+            'height_ratios': [3, 1, 1, 1] if show_volume else [3, 1, 1],
+            'hspace': 0.5
+        }
+    )
+    axes = axes.flatten() if isinstance(axes, np.ndarray) else [axes]
+    ax_idx = 0
+    
+    # K线图和均线
+    ax = axes[ax_idx]
+    ax_idx += 1
+    
+    # 绘制K线
+    up = df[df.close >= df.open]
+    down = df[df.close < df.open]
+
